@@ -1,17 +1,21 @@
-const INITIAL_MINUTE = 0;
-const INITIAL_SECOND = 5;
+const INITIAL_MINUTE = 25;
+const INITIAL_SECOND = 0;
+const INITIAL_POM_MIN = 25;
+const INITIAL_POM_SEC = 0;
+const INITIAL_BREAK_MIN = 5;
+const INITIAL_BREAK_SEC = 0;
 
-let mainTimer = document.querySelector('.main-timer');
+let mainTime  = document.querySelector('.main-timer');
+let pomTime   = document.querySelector('.changer-pomodoro p');
+let breakTime = document.querySelector('.changer-break p');
+let title     = document.querySelector('header h1');
 
-function Time(minutes = INITIAL_MINUTE, seconds = INITIAL_SECOND) {
-    this.initialMinutes = minutes
-    this.initialSeconds = seconds    
+function Time(minutes = 0, seconds = 0) {
     this.minutes = minutes;
     this.seconds = seconds;
     this.passing = false;
-    this.state   = null;
+    this.state = null;
 }
-
 Time.prototype.getTime = function () {
     let time = "";
     if (this.minutes < 10)
@@ -25,12 +29,6 @@ Time.prototype.getTime = function () {
         time += this.seconds;
     return time;
 }
-Time.prototype.setTimeUp = function () {
-    this.minutes++;
-}
-Time.prototype.setTimeDown = function () {
-    this.minutes--;
-}
 Time.prototype.timePass = function () {
     if (this.minutes == 0 && this.seconds == 0)
         return;
@@ -41,57 +39,115 @@ Time.prototype.timePass = function () {
     else
         this.seconds--;
 }
-Time.prototype.timePassing = function(){
-    if(!this.passing)
-    {
-        this.state = setInterval(this.timePass.bind(time), 1000);
+
+Time.prototype.timePassing = function () {
+    if (!this.passing) {
+        this.state = setInterval(this.timePass.bind(this), 1000);
         this.passing = true;
     }
 }
-Time.prototype.stopTimer = function(){
-    if(this.passing)
-    {
+Time.prototype.stopTimer = function () {
+    if (this.passing) {
         clearInterval(this.state);
         this.passing = false;
-        this.state   = null;
-        
+        this.state = null;
+
     }
 }
-Time.prototype.resetTimer = function(){
-    this.minutes = this.initialMinutes;
-    this.seconds = this.initialSeconds;
+Time.prototype.resetTimer = function (initial) {
+    this.minutes = initial.minutes;
+    this.seconds = initial.seconds;
     this.stopTimer();
 }
 
-function changeMainTime(value) {
-    mainTimer.textContent = value;
+Time.prototype.timeUp = function(){
+    if(this.minutes == 99)
+        return 
+    this.minutes++;
+}
+Time.prototype.timeDown = function(){
+    if(this.minutes == 0)
+        return 
+    this.minutes--;
 }
 
-let time = new Time(1, 1);
-changeMainTime(time.getTime()); // sets times in the beginning
-setInterval(()=>changeMainTime(time.getTime()) , 1000) // check the value of the time every 1 second and update it
+
+function Pomodoro() {
+    this.text = 'Pomodoro Technique';
+    this.initial = new Time(INITIAL_MINUTE, INITIAL_SECOND)
+    this.actual = new Time(INITIAL_MINUTE, INITIAL_SECOND)
+
+    this.break = new Time(INITIAL_BREAK_MIN, INITIAL_BREAK_SEC)
+    this.pom = new Time(INITIAL_POM_MIN, INITIAL_POM_SEC)
+
+}
+
+function changeMainTime(value) {
+    mainTime.textContent = value;
+}
+function changePomTime(value) {
+    pomTime.textContent = value;
+}
+function changeBreakTime(value) {
+    breakTime.textContent = value;
+}
+function changeTitle(value){
+    title.textContent  = value;
+}
+
+function updateTimes(){
+    changeMainTime(pomodoro.actual.getTime())
+    changePomTime(pomodoro.pom.getTime())
+    changeBreakTime(pomodoro.break.getTime())
+    changeTitle(pomodoro.text);
+}
+
+let pomodoro = new Pomodoro(1, 1);
+
+// Sets times in the begining
+changeMainTime(pomodoro.initial.getTime());
+changePomTime(pomodoro.pom.getTime());
+changeBreakTime(pomodoro.break.getTime());
 
 
 
-
-
+setInterval(() => updateTimes(pomodoro), 200) // check the value of the time every 0.2 second and update it
 
 const buttons = document.querySelectorAll('.buttons button');
 buttons.forEach(button => button.addEventListener('click', (e) => {
-         
+
     if (button.classList.value == 'start') {
-        time.timePassing();
+        pomodoro.text = 'Study time!'
+        pomodoro.actual.timePassing();
     }
-    else if (button.classList.value == 'stop')
-    {
-        time.stopTimer();
+    else if (button.classList.value == 'stop') {
+        pomodoro.text = 'Paused';
+        pomodoro.actual.stopTimer();
     }
-    else if (button.classList.value == 'reset')
-    {    
-        time.resetTimer();
+    else if (button.classList.value == 'reset') {
+        pomodoro.actual.resetTimer(pomodoro.pom);
     }
 })
 );
+
+const changeButtons = document.querySelectorAll('.changers img')
+changeButtons.forEach(change => change.addEventListener('click', (e) => {
+    if (change.id == 'up-pom') {
+        pomodoro.pom.timeUp();
+        pomodoro.actual.resetTimer(pomodoro.pom);
+    }
+    else if (change.id == 'down-pom') {
+        pomodoro.pom.timeDown();
+        pomodoro.actual.resetTimer(pomodoro.pom);
+    }
+    else if (change.id == 'up-brk') {
+        pomodoro.break.timeUp();
+    }
+    else if (change.id == 'down-brk') {
+        pomodoro.break.timeDown();
+    }
+
+}))
 
 
 
