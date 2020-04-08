@@ -5,6 +5,8 @@ body{
     display: flex;
     justify-content: center;
     align-items: center;
+
+    background-image: url(https://cdn.pixabay.com/photo/2015/11/19/21/11/knowledge-1052011_960_720.jpg);
 }
 
 .container{
@@ -14,27 +16,59 @@ body{
     background-color: #FF4136;
 
     display: grid;
-    grid-template-rows: 15% 85%;
+    grid-template-rows: 18% 82%;
+
+    border: 3px solid black;
+    border-radius: 10px;
 
 }
 
 .main{
+    border-top: 3px solid pink;
+
     display: grid;
-    grid-template-rows: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 2fr 1fr;
 }
 
 .changers{
+
     display: grid;
     grid-template-columns: 1fr 1fr;
     justify-items: center;
     align-items: center;
-    font-size: 45px;
+    font-size: 40px;
+}
+.changer-pomodoro, .changer-break{
+    display: grid;
+    grid-template-columns: 4fr 1fr;
+    justify-items: center;
+    align-items: center;
+    
+}
+p{
+    margin:0;
+}
+.arrows{
+    flex-grow: 1;
+    display: grid;
+}
+
+img{
+    width: 20px;
+    height: 20px;
+    margin-left: 5px;
+    
+    background-color: pink;
+
+    border: 1px solid black;
+    border-radius: 2px;
 }
 .buttons{
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     justify-items: center;
     align-items: center;
+    
 }
 button{
     width: 90px;
@@ -42,14 +76,21 @@ button{
     
     border-radius: 10px;
     outline: none;
+
+    background-color: pink;
 }
 
 h1, .main-timer{
+
+
     display: flex;
     align-items: center;
     justify-content: center;
 }
 .main-timer{
-    font-size: 90px;
+
+    border-top: 3px solid pink;
+
+    font-size: 130px;
 }
 

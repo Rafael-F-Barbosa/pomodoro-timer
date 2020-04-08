@@ -3,10 +3,13 @@ const INITIAL_SECOND = 5;
 
 let mainTimer = document.querySelector('.main-timer');
 
-
 function Time(minutes = INITIAL_MINUTE, seconds = INITIAL_SECOND) {
+    this.initialMinutes = minutes
+    this.initialSeconds = seconds    
     this.minutes = minutes;
     this.seconds = seconds;
+    this.passing = false;
+    this.state   = null;
 }
 
 Time.prototype.getTime = function () {
@@ -38,6 +41,27 @@ Time.prototype.timePass = function () {
     else
         this.seconds--;
 }
+Time.prototype.timePassing = function(){
+    if(!this.passing)
+    {
+        this.state = setInterval(this.timePass.bind(time), 1000);
+        this.passing = true;
+    }
+}
+Time.prototype.stopTimer = function(){
+    if(this.passing)
+    {
+        clearInterval(this.state);
+        this.passing = false;
+        this.state   = null;
+        
+    }
+}
+Time.prototype.resetTimer = function(){
+    this.minutes = this.initialMinutes;
+    this.seconds = this.initialSeconds;
+    this.stopTimer();
+}
 
 function changeMainTime(value) {
     mainTimer.textContent = value;
@@ -45,19 +69,27 @@ function changeMainTime(value) {
 
 let time = new Time(1, 1);
 changeMainTime(time.getTime()); // sets times in the beginning
+setInterval(()=>changeMainTime(time.getTime()) , 1000) // check the value of the time every 1 second and update it
+
+
+
+
+
 
 const buttons = document.querySelectorAll('.buttons button');
-
 buttons.forEach(button => button.addEventListener('click', (e) => {
+         
     if (button.classList.value == 'start') {
-        setInterval(time.timePass.bind(time), 1000)
-        setInterval(()=>changeMainTime(time.getTime()) , 1000)
+        time.timePassing();
     }
     else if (button.classList.value == 'stop')
-        console.log('chou');
+    {
+        time.stopTimer();
+    }
     else if (button.classList.value == 'reset')
-        console.log('xablau');
-
+    {    
+        time.resetTimer();
+    }
 })
 );
 
