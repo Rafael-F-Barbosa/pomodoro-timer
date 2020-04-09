@@ -1,9 +1,7 @@
-const INITIAL_MINUTE = 25;
-const INITIAL_SECOND = 0;
-const INITIAL_POM_MIN = 25;
-const INITIAL_POM_SEC = 0;
-const INITIAL_BREAK_MIN = 5;
-const INITIAL_BREAK_SEC = 0;
+const INITIAL_POM_MIN = 0;
+const INITIAL_POM_SEC = 7;
+const INITIAL_BREAK_MIN = 0;
+const INITIAL_BREAK_SEC = 5;
 
 let mainTime  = document.querySelector('.main-timer');
 let pomTime   = document.querySelector('.changer-pomodoro p');
@@ -15,6 +13,8 @@ function Time(minutes = 0, seconds = 0) {
     this.seconds = seconds;
     this.passing = false;
     this.state = null;
+    this.which = 'res';
+    this.whichPaused = '';
 }
 Time.prototype.getTime = function () {
     let time = "";
@@ -31,7 +31,24 @@ Time.prototype.getTime = function () {
 }
 Time.prototype.timePass = function () {
     if (this.minutes == 0 && this.seconds == 0)
+    {
+        if(this.which == 'pom')
+        {
+            this.minutes = pomodoro.break.minutes;
+            this.seconds = pomodoro.break.seconds;
+            this.which   = 'brk'
+            console.log('asd');
+            
+        }
+        else if(this.which == 'brk')
+        {
+            this.minutes = pomodoro.pom.minutes;
+            this.seconds = pomodoro.pom.seconds;
+            this.which   = 'pom'
+            console.log('hue');
+        }        
         return;
+    }
     if (this.seconds == 0) {
         this.minutes--;
         this.seconds = 59;
@@ -74,8 +91,8 @@ Time.prototype.timeDown = function(){
 
 function Pomodoro() {
     this.text = 'Pomodoro Technique';
-    this.initial = new Time(INITIAL_MINUTE, INITIAL_SECOND)
-    this.actual = new Time(INITIAL_MINUTE, INITIAL_SECOND)
+    this.initial = new Time(INITIAL_POM_MIN, INITIAL_POM_SEC)
+    this.actual = new Time(INITIAL_POM_MIN, INITIAL_POM_SEC)
 
     this.break = new Time(INITIAL_BREAK_MIN, INITIAL_BREAK_SEC)
     this.pom = new Time(INITIAL_POM_MIN, INITIAL_POM_SEC)
@@ -91,15 +108,29 @@ function changePomTime(value) {
 function changeBreakTime(value) {
     breakTime.textContent = value;
 }
-function changeTitle(value){
-    title.textContent  = value;
+function changeTitle(pomodoro){
+    if(pomodoro.actual.which == 'res'){
+        pomodoro.text =  'Pomodoro Technique';
+    }
+    else if(pomodoro.actual.which == 'pom'){
+        pomodoro.text = 'Study time!'
+    }
+    else if(pomodoro.actual.which == 'pau'){
+        pomodoro.text =  'Paused';
+    }
+    else if(pomodoro.actual.which == 'brk'){
+        pomodoro.text =  'Break Time!';
+    }
+    
+    title.textContent = pomodoro.text;
 }
 
-function updateTimes(){
+function updateTimes(pomodoro){
     changeMainTime(pomodoro.actual.getTime())
     changePomTime(pomodoro.pom.getTime())
     changeBreakTime(pomodoro.break.getTime())
-    changeTitle(pomodoro.text);
+    changeTitle(pomodoro);
+
 }
 
 let pomodoro = new Pomodoro(1, 1);
@@ -111,20 +142,27 @@ changeBreakTime(pomodoro.break.getTime());
 
 
 
-setInterval(() => updateTimes(pomodoro), 200) // check the value of the time every 0.2 second and update it
+setInterval(() => updateTimes(pomodoro), 100) // check the value of the time every 0.2 second and update it
 
+
+/*************   Events  *****************/
 const buttons = document.querySelectorAll('.buttons button');
 buttons.forEach(button => button.addEventListener('click', (e) => {
 
     if (button.classList.value == 'start') {
-        pomodoro.text = 'Study time!'
         pomodoro.actual.timePassing();
+        if(pomodoro.actual.which == 'pau')
+        pomodoro.actual.which = pomodoro.actual.whichPaused;
+        else 
+            pomodoro.actual.which = 'pom'
     }
     else if (button.classList.value == 'stop') {
-        pomodoro.text = 'Paused';
+        pomodoro.actual.whichPaused = pomodoro.actual.which;
+        pomodoro.actual.which = 'pau';
         pomodoro.actual.stopTimer();
     }
     else if (button.classList.value == 'reset') {
+        pomodoro.actual.which = 'res'
         pomodoro.actual.resetTimer(pomodoro.pom);
     }
 })
