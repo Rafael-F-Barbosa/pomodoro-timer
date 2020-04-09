@@ -1,7 +1,7 @@
-const INITIAL_POM_MIN = 0;
-const INITIAL_POM_SEC = 4;
-const INITIAL_BREAK_MIN = 0;
-const INITIAL_BREAK_SEC = 7;
+const INITIAL_POM_MIN = 25;
+const INITIAL_POM_SEC = 0;
+const INITIAL_BREAK_MIN = 5;
+const INITIAL_BREAK_SEC = 0;
 
 const mainTime  = document.querySelector('.main-timer');
 const pomTime   = document.querySelector('.changer-pomodoro p');
